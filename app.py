@@ -60,7 +60,7 @@ def log_request(path):
         except:
             data = ''
         res = {
-            'data': data,
+            'message': "Success",
             'status_code': status_code
         }
         log_data_f['res'] = res
@@ -72,7 +72,7 @@ def log_request(path):
         log_data_f['req'] = log_data
         data = r.json()
         res = {
-            'data': data,
+            'message': e,
             'status_code': status_code
         }
         log_data_f['res'] = res
