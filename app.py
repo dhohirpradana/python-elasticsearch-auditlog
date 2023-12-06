@@ -55,7 +55,10 @@ def log_request(path):
         r.raise_for_status()
         status_code = r.status_code
         log_data_f['req'] = log_data
-        data = r.json()
+        try:
+            data = r.json()
+        except:
+            data = ''
         res = {
             'data': data,
             'status_code': status_code
