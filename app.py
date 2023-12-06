@@ -70,13 +70,13 @@ def log_request(path):
     except requests.HTTPError as e:
         status_code = e.response.status_code
         log_data_f['req'] = log_data
-        data = r.json()
         res = {
-            'message': e,
+            'message': str(e),
             'status_code': status_code
         }
         log_data_f['res'] = res
         print("Error message:", e)
+        print("log_data_f", log_data_f)
         es_handler(log_data_f)
         return jsonify({"message": str(e)}), status_code
         
