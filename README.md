@@ -1,4 +1,4 @@
-# Auditlog using python and store to ElasticSearch
+# Auditlog using Python and store to ElasticSearch
 ```bash
 docker build https://github.com/dhohirpradana/python-elasticsearch-auditlog.git#master:. --network host
 ```
