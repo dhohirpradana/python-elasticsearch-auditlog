@@ -62,7 +62,7 @@ def log_request(path):
         }
         log_data_f['res'] = res
         es_handler(log_data_f)
-        return jsonify({"message": "Success"}), status_code
+        return jsonify(data), status_code
         
     except requests.HTTPError as e:
         status_code = e.response.status_code
