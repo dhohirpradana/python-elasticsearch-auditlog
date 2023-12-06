@@ -28,6 +28,7 @@ def log_request(path):
     }
     
     url = path
+    max_length = 20
     
     try:
         headers = dict(request.headers)
@@ -39,12 +40,21 @@ def log_request(path):
             r = requests.get(url, headers=headers)
         elif request.method.lower() == 'post':
             log_data['data'] = json.loads(request.get_data().decode('utf-8'))
+            if 'content' in log_data['data']:
+                if len(log_data['data']['content']) > max_length:
+                    log_data['data']['content'] = log_data['data']['content'][:max_length] + '...and ' + str(len(log_data['data']['content']) - max_length) + ' char'
             r = requests.post(url, headers=headers, json=json.loads(request.get_data().decode('utf-8')))
         elif request.method.lower() == 'put':
             log_data['data'] = json.loads(request.get_data().decode('utf-8'))
+            if 'content' in log_data['data']:
+                if len(log_data['data']['content']) > max_length:
+                    log_data['data']['content'] = log_data['data']['content'][:max_length] + '...and ' + str(len(log_data['data']['content']) - max_length) + ' char'
             r = requests.put(url, headers=headers, json=json.loads(request.get_data().decode('utf-8')))
         elif request.method.lower() == 'patch':
             log_data['data'] = json.loads(request.get_data().decode('utf-8'))
+            if 'content' in log_data['data']:
+                if len(log_data['data']['content']) > max_length:
+                    log_data['data']['content'] = log_data['data']['content'][:max_length] + '...and ' + str(len(log_data['data']['content']) - max_length) + ' char'
             r = requests.patch(url, headers=headers, json=json.loads(request.get_data().decode('utf-8')))
         elif request.method.lower() == 'delete':
             r = requests.delete(url, headers=headers)
