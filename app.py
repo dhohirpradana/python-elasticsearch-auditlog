@@ -39,13 +39,13 @@ def log_request(path):
             r = requests.get(url, headers=headers)
         elif request.method.lower() == 'post':
             log_data['data'] = json.loads(request.get_data().decode('utf-8'))
-            r = requests.post(url, headers=headers, json=request.get_data().decode('utf-8'))
+            r = requests.post(url, headers=headers, json=json.loads(request.get_data().decode('utf-8')))
         elif request.method.lower() == 'put':
             log_data['data'] = json.loads(request.get_data().decode('utf-8'))
-            r = requests.put(url, headers=headers, json=request.get_data().decode('utf-8'))
+            r = requests.put(url, headers=headers, json=json.loads(request.get_data().decode('utf-8')))
         elif request.method.lower() == 'patch':
             log_data['data'] = json.loads(request.get_data().decode('utf-8'))
-            r = requests.patch(url, headers=headers, json=request.get_data().decode('utf-8'))
+            r = requests.patch(url, headers=headers, json=json.loads(request.get_data().decode('utf-8')))
         elif request.method.lower() == 'delete':
             r = requests.delete(url, headers=headers)
         else:
