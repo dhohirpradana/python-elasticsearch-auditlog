@@ -10,7 +10,8 @@ from elastic import handler as es_handler
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
-required_env_vars = ["ELASTIC_URL"]
+required_env_vars = ["ELASTIC_URL", "MY_URL"]
+my_url = os.environ.get('MY_URL')
 
 def validate_envs():
     for env_var in required_env_vars:
@@ -23,7 +24,7 @@ def log_request(path):
     log_data = {
         'timestamp': datetime.datetime.now().isoformat(),
         'method': request.method,
-        'url': request.url,
+        'url': request.url.replace(my_url, ''),
         'headers': dict(request.headers),
     }
     
