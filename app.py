@@ -34,7 +34,9 @@ def log_request(path):
     
     # check if data is form data or json
     def to_json():
-        if request.headers['Content-Type'] == 'application/x-www-form-urlencoded' or request.headers['Content-Type'] == 'multipart/form-data':
+        # if request.headers['Content-Type'] contains 'application/x-www-form-urlencoded' or 'multipart/form-data'
+        if 'multipart/form-data' in request.headers['Content-Type'] or 'application/x-www-form-urlencoded' in request.headers['Content-Type']:
+            # to json format
             return dict(request.form)
         return json.loads(request.get_data().decode('utf-8'))
     
@@ -110,6 +112,13 @@ def log_request(path):
 def catch_all(path):
     validate_envs()
     return log_request(path)
+
+# test
+@app.route('/test', methods=['POST', 'GET', 'PATCH', 'PUT', 'DELETE'])
+def test():
+    data = dict(request.form.to_dict(flat=False))
+    print(data)
+    return jsonify(data)
 
 if __name__ == '__main__':
     app.run(debug=True)
