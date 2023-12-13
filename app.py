@@ -21,6 +21,7 @@ def validate_envs():
                 f"Required environment variable {env_var} is not set.")
 
 def log_request(path):
+    print("path", path)
     log_data_f = {}
     log_data = {
         'timestamp': datetime.datetime.now().isoformat(),
@@ -31,6 +32,12 @@ def log_request(path):
     
     url = path
     max_length = 20
+    
+    # join url and query string
+    if request.query_string:
+        url = url + '?' + request.query_string.decode('utf-8')
+        
+    print("url", url)
     
     # check if data is form data or json
     def to_json():
