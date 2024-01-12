@@ -55,11 +55,11 @@ def log_request(path):
     
     if request.method.lower() == 'post':
             log_data['data'] = to_json()
-            # teruskan file dari form-data ke requests post
+            # teruskan
             if 'content' in log_data['data']:
                 if len(log_data['data']['content']) > max_length:
                     log_data['data']['content'] = log_data['data']['content'][:max_length] + '...and ' + str(len(log_data['data']['content']) - max_length) + ' char'
-            response = requests.post(url, headers=headers, json=to_json(), files=request.files)
+            response = requests.post(url, headers=headers, json=to_json())
             
             if response.status_code == 200:
                 data = response.json()
