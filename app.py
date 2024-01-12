@@ -47,12 +47,29 @@ def log_request(path):
             return dict(request.form)
         return json.loads(request.get_data().decode('utf-8'))
     
+    
+    headers = dict(request.headers)
+    keys_to_remove = ['Content-Type', 'User-Agent', 'Accept', 'Postman-Token', 'Host', 'Accept-Encoding', 'Connection', 'Content-Length']
+    
+    headers = {key: value for key, value in headers.items() if key not in keys_to_remove}
+    
+    if request.method.lower() == 'post':
+            log_data['data'] = to_json()
+            # teruskan file dari form-data ke requests post
+            if 'content' in log_data['data']:
+                if len(log_data['data']['content']) > max_length:
+                    log_data['data']['content'] = log_data['data']['content'][:max_length] + '...and ' + str(len(log_data['data']['content']) - max_length) + ' char'
+            response = requests.post(url, headers=headers, json=to_json(), files=request.files)
+            
+            if response.status_code == 200:
+                data = response.json()
+                print(data)
+            else:
+                print(f"Request failed with status code {response.status_code}: {response.json()}")
+                
+            return jsonify(response.json()), response.status_code
+    
     try:
-        headers = dict(request.headers)
-        keys_to_remove = ['Content-Type', 'User-Agent', 'Accept', 'Postman-Token', 'Host', 'Accept-Encoding', 'Connection', 'Content-Length']
-        
-        headers = {key: value for key, value in headers.items() if key not in keys_to_remove}
-
         if request.method.lower() == 'get':
             r = requests.get(url, headers=headers)
         elif request.method.lower() == 'post':
