@@ -17,10 +17,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set ENV variables
-        run: |
-          echo "REPO_NAME=${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}" >> $GITHUB_ENV
-
       - name: Build the Docker image
         run: docker build . --file Dockerfile --tag $REPO_NAME
 
