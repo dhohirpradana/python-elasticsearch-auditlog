@@ -14,11 +14,13 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 required_env_vars = ["ELASTIC_URL", "MY_URL"]
 my_url = os.environ.get('MY_URL')
 
+
 def validate_envs():
     for env_var in required_env_vars:
         if env_var not in os.environ:
             raise EnvironmentError(
                 f"Required environment variable {env_var} is not set.")
+
 
 def log_request(path):
     print("path", path)
@@ -29,16 +31,16 @@ def log_request(path):
         'url': request.url.replace(my_url, ''),
         'headers': dict(request.headers),
     }
-    
+
     url = path
     max_length = 20
-    
+
     # join url and query string
     if request.query_string:
         url = url + '?' + request.query_string.decode('utf-8')
-        
+
     print("url", url)
-    
+
     # check if data is form data or json
     def to_json():
         # if request.headers['Content-Type'] contains 'application/x-www-form-urlencoded' or 'multipart/form-data'
@@ -46,29 +48,77 @@ def log_request(path):
             # to json format
             return dict(request.form)
         return json.loads(request.get_data().decode('utf-8'))
-    
-    
+
     headers = dict(request.headers)
-    keys_to_remove = ['Content-Type', 'User-Agent', 'Accept', 'Postman-Token', 'Host', 'Accept-Encoding', 'Connection', 'Content-Length']
-    
-    headers = {key: value for key, value in headers.items() if key not in keys_to_remove}
-    
+    keys_to_remove = ['Content-Type', 'User-Agent', 'Accept', 'Postman-Token',
+                      'Host', 'Accept-Encoding', 'Connection', 'Content-Length']
+
+    headers = {key: value for key,
+               value in headers.items() if key not in keys_to_remove}
+
     if request.method.lower() == 'post':
-            log_data['data'] = to_json()
-            # teruskan
-            if 'content' in log_data['data']:
-                if len(log_data['data']['content']) > max_length:
-                    log_data['data']['content'] = log_data['data']['content'][:max_length] + '...and ' + str(len(log_data['data']['content']) - max_length) + ' char'
-            response = requests.post(url, headers=headers, json=to_json())
-            
-            if response.status_code == 200:
-                data = response.json()
-                print(data)
-            else:
-                print(f"Request failed with status code {response.status_code}: {response.json()}")
-                
-            return jsonify(response.json()), response.status_code
-    
+        log_data['data'] = to_json()
+        # teruskan
+        if 'content' in log_data['data']:
+            if len(log_data['data']['content']) > max_length:
+                log_data['data']['content'] = log_data['data']['content'][:max_length] + \
+                    '...and ' + \
+                    str(len(log_data['data']['content']) -
+                        max_length) + ' char'
+        response = requests.post(url, headers=headers,
+                                 json=to_json(), verify=False)
+
+        if response.status_code == 200:
+            data = response.json()
+            print(data)
+        else:
+            print(
+                f"Request failed with status code {response.status_code}: {response.json()}")
+
+        return jsonify(response.json()), response.status_code
+
+    if request.method.lower() == 'get':
+        response = requests.get(url, headers=headers)
+
+        if response.status_code == 200:
+            data = response.json()
+            print(data)
+        else:
+            print(
+                f"Request failed with status code {response.status_code}: {response.json()}")
+
+        return jsonify(response.json()), response.status_code
+
+    if request.method.lower() == 'put':
+        response = requests.put(url, headers=headers, json=to_json())
+        if response.status_code == 200:
+            data = response.json()
+            print(data)
+        else:
+            print(
+                f"Request failed with status code {response.status_code}: {response.json()}")
+        return jsonify(response.json()), response.status_code
+
+    if request.method.lower() == 'patch':
+        response = requests.patch(url, headers=headers, json=to_json())
+        if response.status_code == 200:
+            data = response.json()
+            print(data)
+        else:
+            print(
+                f"Request failed with status code {response.status_code}: {response.json()}")
+        return jsonify(response.json()), response.status_code
+
+    if request.method.lower() == 'delete':
+        response = requests.delete(url, headers=headers)
+        if response.status_code == 200:
+            data = response.json()
+            print(data)
+        else:
+            print(
+                f"Request failed with status code {response.status_code}: {response.json()}")
+        return jsonify(response.json()), response.status_code
+
     try:
         if request.method.lower() == 'get':
             r = requests.get(url, headers=headers)
@@ -76,26 +126,35 @@ def log_request(path):
             log_data['data'] = to_json()
             if 'content' in log_data['data']:
                 if len(log_data['data']['content']) > max_length:
-                    log_data['data']['content'] = log_data['data']['content'][:max_length] + '...and ' + str(len(log_data['data']['content']) - max_length) + ' char'
+                    log_data['data']['content'] = log_data['data']['content'][:max_length] + \
+                        '...and ' + \
+                        str(len(log_data['data']['content']) -
+                            max_length) + ' char'
             r = requests.post(url, headers=headers, json=to_json())
         elif request.method.lower() == 'put':
             log_data['data'] = to_json()
             if 'content' in log_data['data']:
                 if len(log_data['data']['content']) > max_length:
-                    log_data['data']['content'] = log_data['data']['content'][:max_length] + '...and ' + str(len(log_data['data']['content']) - max_length) + ' char'
+                    log_data['data']['content'] = log_data['data']['content'][:max_length] + \
+                        '...and ' + \
+                        str(len(log_data['data']['content']) -
+                            max_length) + ' char'
             r = requests.put(url, headers=headers, json=to_json())
         elif request.method.lower() == 'patch':
             log_data['data'] = to_json()
             if 'content' in log_data['data']:
                 if len(log_data['data']['content']) > max_length:
-                    log_data['data']['content'] = log_data['data']['content'][:max_length] + '...and ' + str(len(log_data['data']['content']) - max_length) + ' char'
+                    log_data['data']['content'] = log_data['data']['content'][:max_length] + \
+                        '...and ' + \
+                        str(len(log_data['data']['content']) -
+                            max_length) + ' char'
             r = requests.patch(url, headers=headers, json=to_json())
         elif request.method.lower() == 'delete':
             r = requests.delete(url, headers=headers)
         else:
             print("Invalid method specified")
             return jsonify({"message": "Invalid method specified"}), 400
-        
+
         r.raise_for_status()
         status_code = r.status_code
         log_data_f['req'] = log_data
@@ -110,7 +169,7 @@ def log_request(path):
         log_data_f['res'] = res
         es_handler(log_data_f)
         return jsonify(data), status_code
-        
+
     except requests.HTTPError as e:
         status_code = e.response.status_code
         log_data_f['req'] = log_data
@@ -123,13 +182,14 @@ def log_request(path):
         print("log_data_f", log_data_f)
         es_handler(log_data_f)
         return jsonify({"message": str(e)}), status_code
-        
+
     except Exception as e:
         print("Error:", e)
         traceback_info = traceback.format_exc()
 
         print(traceback_info)
         return jsonify({"message": str(e)}), 500
+
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>', methods=['POST', 'GET', 'PATCH', 'PUT', 'DELETE'])
@@ -138,11 +198,14 @@ def catch_all(path):
     return log_request(path)
 
 # test
+
+
 @app.route('/test', methods=['POST', 'GET', 'PATCH', 'PUT', 'DELETE'])
 def test():
     data = dict(request.form.to_dict(flat=False))
     print(data)
     return jsonify(data)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
