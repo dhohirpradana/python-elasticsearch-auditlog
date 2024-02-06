@@ -56,68 +56,73 @@ def log_request(path):
     headers = {key: value for key,
                value in headers.items() if key not in keys_to_remove}
 
-    if request.method.lower() == 'post':
-        log_data['data'] = to_json()
-        # teruskan
-        if 'content' in log_data['data']:
-            if len(log_data['data']['content']) > max_length:
-                log_data['data']['content'] = log_data['data']['content'][:max_length] + \
-                    '...and ' + \
-                    str(len(log_data['data']['content']) -
-                        max_length) + ' char'
-        response = requests.post(url, headers=headers,
-                                 json=to_json(), verify=False)
+    try:
+        if request.method.lower() == 'post':
+            log_data['data'] = to_json()
+            # teruskan
+            if 'content' in log_data['data']:
+                if len(log_data['data']['content']) > max_length:
+                    log_data['data']['content'] = log_data['data']['content'][:max_length] + \
+                        '...and ' + \
+                        str(len(log_data['data']['content']) -
+                            max_length) + ' char'
+            response = requests.post(url, headers=headers,
+                                     json=to_json(), verify=False)
 
-        if response.status_code == 200:
-            data = response.json()
-            print(data)
-        else:
-            print(
-                f"Request failed with status code {response.status_code}: {response.json()}")
+            if response.status_code == 200:
+                data = response.json()
+                print(data)
+            else:
+                print(
+                    f"Request failed with status code {response.status_code}: {response.json()}")
 
-        return jsonify(response.json()), response.status_code
+            return jsonify(response.json()), response.status_code
 
-    if request.method.lower() == 'get':
-        response = requests.get(url, headers=headers)
+        if request.method.lower() == 'get':
+            response = requests.get(url, headers=headers)
 
-        if response.status_code == 200:
-            data = response.json()
-            print(data)
-        else:
-            print(
-                f"Request failed with status code {response.status_code}: {response.json()}")
+            if response.status_code == 200:
+                data = response.json()
+                print(data)
+            else:
+                print(
+                    f"Request failed with status code {response.status_code}: {response.json()}")
 
-        return jsonify(response.json()), response.status_code
+            return jsonify(response.json()), response.status_code
 
-    if request.method.lower() == 'put':
-        response = requests.put(url, headers=headers, json=to_json())
-        if response.status_code == 200:
-            data = response.json()
-            print(data)
-        else:
-            print(
-                f"Request failed with status code {response.status_code}: {response.json()}")
-        return jsonify(response.json()), response.status_code
+        if request.method.lower() == 'put':
+            response = requests.put(url, headers=headers, json=to_json())
+            if response.status_code == 200:
+                data = response.json()
+                print(data)
+            else:
+                print(
+                    f"Request failed with status code {response.status_code}: {response.json()}")
+            return jsonify(response.json()), response.status_code
 
-    if request.method.lower() == 'patch':
-        response = requests.patch(url, headers=headers, json=to_json())
-        if response.status_code == 200:
-            data = response.json()
-            print(data)
-        else:
-            print(
-                f"Request failed with status code {response.status_code}: {response.json()}")
-        return jsonify(response.json()), response.status_code
+        if request.method.lower() == 'patch':
+            response = requests.patch(url, headers=headers, json=to_json())
+            if response.status_code == 200:
+                data = response.json()
+                print(data)
+            else:
+                print(
+                    f"Request failed with status code {response.status_code}: {response.json()}")
+            return jsonify(response.json()), response.status_code
 
-    if request.method.lower() == 'delete':
-        response = requests.delete(url, headers=headers)
-        if response.status_code == 200:
-            data = response.json()
-            print(data)
-        else:
-            print(
-                f"Request failed with status code {response.status_code}: {response.json()}")
-        return jsonify(response.json()), response.status_code
+        if request.method.lower() == 'delete':
+            response = requests.delete(url, headers=headers)
+            if response.status_code == 200:
+                data = response.json()
+                print(data)
+            else:
+                print(
+                    f"Request failed with status code {response.status_code}: {response.json()}")
+            return jsonify(response.json()), response.status_code
+
+    except requests.HTTPError as e:
+        print(e)
+        return jsonify({"message": str(e)}), 500
 
     # try:
     #     if request.method.lower() == 'get':
