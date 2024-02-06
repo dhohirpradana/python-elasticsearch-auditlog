@@ -119,76 +119,76 @@ def log_request(path):
                 f"Request failed with status code {response.status_code}: {response.json()}")
         return jsonify(response.json()), response.status_code
 
-    try:
-        if request.method.lower() == 'get':
-            r = requests.get(url, headers=headers)
-        elif request.method.lower() == 'post':
-            log_data['data'] = to_json()
-            if 'content' in log_data['data']:
-                if len(log_data['data']['content']) > max_length:
-                    log_data['data']['content'] = log_data['data']['content'][:max_length] + \
-                        '...and ' + \
-                        str(len(log_data['data']['content']) -
-                            max_length) + ' char'
-            r = requests.post(url, headers=headers, json=to_json())
-        elif request.method.lower() == 'put':
-            log_data['data'] = to_json()
-            if 'content' in log_data['data']:
-                if len(log_data['data']['content']) > max_length:
-                    log_data['data']['content'] = log_data['data']['content'][:max_length] + \
-                        '...and ' + \
-                        str(len(log_data['data']['content']) -
-                            max_length) + ' char'
-            r = requests.put(url, headers=headers, json=to_json())
-        elif request.method.lower() == 'patch':
-            log_data['data'] = to_json()
-            if 'content' in log_data['data']:
-                if len(log_data['data']['content']) > max_length:
-                    log_data['data']['content'] = log_data['data']['content'][:max_length] + \
-                        '...and ' + \
-                        str(len(log_data['data']['content']) -
-                            max_length) + ' char'
-            r = requests.patch(url, headers=headers, json=to_json())
-        elif request.method.lower() == 'delete':
-            r = requests.delete(url, headers=headers)
-        else:
-            print("Invalid method specified")
-            return jsonify({"message": "Invalid method specified"}), 400
+    # try:
+    #     if request.method.lower() == 'get':
+    #         r = requests.get(url, headers=headers)
+    #     elif request.method.lower() == 'post':
+    #         log_data['data'] = to_json()
+    #         if 'content' in log_data['data']:
+    #             if len(log_data['data']['content']) > max_length:
+    #                 log_data['data']['content'] = log_data['data']['content'][:max_length] + \
+    #                     '...and ' + \
+    #                     str(len(log_data['data']['content']) -
+    #                         max_length) + ' char'
+    #         r = requests.post(url, headers=headers, json=to_json())
+    #     elif request.method.lower() == 'put':
+    #         log_data['data'] = to_json()
+    #         if 'content' in log_data['data']:
+    #             if len(log_data['data']['content']) > max_length:
+    #                 log_data['data']['content'] = log_data['data']['content'][:max_length] + \
+    #                     '...and ' + \
+    #                     str(len(log_data['data']['content']) -
+    #                         max_length) + ' char'
+    #         r = requests.put(url, headers=headers, json=to_json())
+    #     elif request.method.lower() == 'patch':
+    #         log_data['data'] = to_json()
+    #         if 'content' in log_data['data']:
+    #             if len(log_data['data']['content']) > max_length:
+    #                 log_data['data']['content'] = log_data['data']['content'][:max_length] + \
+    #                     '...and ' + \
+    #                     str(len(log_data['data']['content']) -
+    #                         max_length) + ' char'
+    #         r = requests.patch(url, headers=headers, json=to_json())
+    #     elif request.method.lower() == 'delete':
+    #         r = requests.delete(url, headers=headers)
+    #     else:
+    #         print("Invalid method specified")
+    #         return jsonify({"message": "Invalid method specified"}), 400
 
-        r.raise_for_status()
-        status_code = r.status_code
-        log_data_f['req'] = log_data
-        try:
-            data = r.json()
-        except:
-            data = ''
-        res = {
-            'message': "Success",
-            'status_code': status_code
-        }
-        log_data_f['res'] = res
-        es_handler(log_data_f)
-        return jsonify(data), status_code
+    #     r.raise_for_status()
+    #     status_code = r.status_code
+    #     log_data_f['req'] = log_data
+    #     try:
+    #         data = r.json()
+    #     except:
+    #         data = ''
+    #     res = {
+    #         'message': "Success",
+    #         'status_code': status_code
+    #     }
+    #     log_data_f['res'] = res
+    #     es_handler(log_data_f)
+    #     return jsonify(data), status_code
 
-    except requests.HTTPError as e:
-        status_code = e.response.status_code
-        log_data_f['req'] = log_data
-        res = {
-            'message': str(e),
-            'status_code': status_code
-        }
-        log_data_f['res'] = res
-        print("Error message:", e)
-        print("log_data_f", log_data_f)
-        es_handler(log_data_f)
-        return jsonify({"message": str(e)}), status_code
+    # except requests.HTTPError as e:
+    #     status_code = e.response.status_code
+    #     log_data_f['req'] = log_data
+    #     res = {
+    #         'message': str(e),
+    #         'status_code': status_code
+    #     }
+    #     log_data_f['res'] = res
+    #     print("Error message:", e)
+    #     print("log_data_f", log_data_f)
+    #     es_handler(log_data_f)
+    #     return jsonify({"message": str(e)}), status_code
 
-    except Exception as e:
-        print("Error:", e)
-        traceback_info = traceback.format_exc()
+    # except Exception as e:
+    #     print("Error:", e)
+    #     traceback_info = traceback.format_exc()
 
-        print(traceback_info)
-        return jsonify({"message": str(e)}), 500
+    #     print(traceback_info)
+    #     return jsonify({"message": str(e)}), 500
 
 
 @app.route('/', defaults={'path': ''})
