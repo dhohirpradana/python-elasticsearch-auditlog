@@ -69,16 +69,15 @@ def log_request(path):
         es_handler(log_data_f)
 
     def cut_data_char(log):
-        print(log)
-        try:
-            if 'content' in log['data']:
-                if len(log['data']['content']) > max_length:
-                    log['data']['content'] = log['data']['content'][:max_length] + \
-                        '...and ' + \
-                        str(len(log['data']['content']) -
-                            max_length) + ' char'
-        except:
-            pass
+        # try:
+        #     if 'content' in log['data']:
+        #         if len(log['data']['content']) > max_length:
+        #             log['data']['content'] = log['data']['content'][:max_length] + \
+        #                 '...and ' + \
+        #                 str(len(log['data']['content']) -
+        #                     max_length) + ' char'
+        # except:
+        #     pass
 
         return log
 
@@ -126,6 +125,8 @@ def log_request(path):
         if request.method.lower() == 'put':
             log_data['data'] = to_json()
             log_data = cut_data_char(log_data)
+
+            print("TO JSON", to_json())
 
             response = requests.put(url, headers=headers, json=to_json())
 
