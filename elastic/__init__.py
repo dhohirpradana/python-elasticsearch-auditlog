@@ -10,10 +10,8 @@ def handler(data):
     uuid4 = uuid.uuid4()
     document_id = uuid4
 
-    print("DATA", data)
-
     try:
-        es = Elasticsearch(hosts='http://10.1.111.13:9201')
+        es = Elasticsearch(hosts=elastic_url)
         es.index(index=index_name, document=data, id=document_id)
         print("Success insert data to elastic")
     except Exception as e:

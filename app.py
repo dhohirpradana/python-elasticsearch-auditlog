@@ -73,13 +73,16 @@ def log_request(path):
         es_handler(log_data_f)
 
     def cut_data_char(log):
-        print(log)
-        if 'content' in log['data']:
-            if len(log['data']['content']) > max_length:
-                log['data']['content'] = log['data']['content'][:max_length] + \
-                    '...and ' + \
-                    str(len(log['data']['content']) -
-                        max_length) + ' char'
+        # print(log)
+        # try:
+        #     if 'content' in log['data']:
+        #         if len(log['data']['content']) > max_length:
+        #             log['data']['content'] = log['data']['content'][:max_length] + \
+        #                 '...and ' + \
+        #                 str(len(log['data']['content']) -
+        #                     max_length) + ' char'
+        # except:
+        #     pass
 
         return log
 
