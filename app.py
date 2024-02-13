@@ -42,19 +42,16 @@ def log_request(path):
         url = url + '?' + request.query_string.decode('utf-8')
 
     print("url", url)
+    print("REQUEST", request.data)
 
     # check if data is form data or json
     def to_json():
         # if request.headers['Content-Type'] contains 'application/x-www-form-urlencoded' or 'multipart/form-data'
-        try:
-            if 'multipart/form-data' in request.headers['Content-Type'] or 'application/x-www-form-urlencoded' in request.headers['Content-Type']:
-                # to json format
-                return dict(request.form)
-        except:
-            try:
-                return json.loads(request.get_data().decode('utf-8'))
-            except:
-                return {}
+        if 'multipart/form-data' in request.headers['Content-Type'] or 'application/x-www-form-urlencoded' in request.headers['Content-Type']:
+            # to json format
+            return dict(request.form)
+        else:
+            return request.get_json()
 
     def save_log(r):
         status_code = r.status_code
@@ -73,16 +70,16 @@ def log_request(path):
         es_handler(log_data_f)
 
     def cut_data_char(log):
-        # print(log)
-        # try:
-        #     if 'content' in log['data']:
-        #         if len(log['data']['content']) > max_length:
-        #             log['data']['content'] = log['data']['content'][:max_length] + \
-        #                 '...and ' + \
-        #                 str(len(log['data']['content']) -
-        #                     max_length) + ' char'
-        # except:
-        #     pass
+        print(log)
+        try:
+            if 'content' in log['data']:
+                if len(log['data']['content']) > max_length:
+                    log['data']['content'] = log['data']['content'][:max_length] + \
+                        '...and ' + \
+                        str(len(log['data']['content']) -
+                            max_length) + ' char'
+        except:
+            pass
 
         return log
 
