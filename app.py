@@ -46,10 +46,15 @@ def log_request(path):
     # check if data is form data or json
     def to_json():
         # if request.headers['Content-Type'] contains 'application/x-www-form-urlencoded' or 'multipart/form-data'
-        if 'multipart/form-data' in request.headers['Content-Type'] or 'application/x-www-form-urlencoded' in request.headers['Content-Type']:
-            # to json format
-            return dict(request.form)
-        return json.loads(request.get_data().decode('utf-8'))
+        try:
+            if 'multipart/form-data' in request.headers['Content-Type'] or 'application/x-www-form-urlencoded' in request.headers['Content-Type']:
+                # to json format
+                return dict(request.form)
+        except:
+            try:
+                return json.loads(request.get_data().decode('utf-8'))
+            except:
+                return {}
 
     def save_log(r):
         status_code = r.status_code
@@ -64,7 +69,17 @@ def log_request(path):
             'status_code': status_code
         }
         log_data_f['res'] = res
+        print("LOG DATA", log_data_f)
         es_handler(log_data_f)
+
+    def cut_data_char(log_data):
+        for key in log_data['data'].keys():
+            if len(log_data['data'][key]) > max_length:
+                log_data['data'][key] = log_data['data'][key][:max_length] + \
+                    '...and ' + \
+                    str(len(log_data['data'][key]) - max_length) + ' char'
+
+        return log_data
 
     headers = dict(request.headers)
     keys_to_remove = ['Content-Type', 'User-Agent', 'Accept', 'Postman-Token',
@@ -76,15 +91,11 @@ def log_request(path):
     try:
         if request.method.lower() == 'post':
             log_data['data'] = to_json()
-            # teruskan
-            if 'content' in log_data['data']:
-                if len(log_data['data']['content']) > max_length:
-                    log_data['data']['content'] = log_data['data']['content'][:max_length] + \
-                        '...and ' + \
-                        str(len(log_data['data']['content']) -
-                            max_length) + ' char'
+
+            log_data = cut_data_char(log_data)
+
             response = requests.post(url, headers=headers,
-                                     json=to_json(), verify=False)
+                                     json=to_json(), verify=False, timeout=60)
 
             if response.status_code == 200:
                 data = response.json()
@@ -112,7 +123,11 @@ def log_request(path):
             return jsonify(response.json()), response.status_code
 
         if request.method.lower() == 'put':
+            log_data['data'] = to_json()
+            log_data = cut_data_char(log_data)
+
             response = requests.put(url, headers=headers, json=to_json())
+
             if response.status_code == 200:
                 data = response.json()
                 print(data)
@@ -125,6 +140,9 @@ def log_request(path):
             return jsonify(response.json()), response.status_code
 
         if request.method.lower() == 'patch':
+            log_data['data'] = to_json()
+            log_data = cut_data_char(log_data)
+
             response = requests.patch(url, headers=headers, json=to_json())
             if response.status_code == 200:
                 data = response.json()
