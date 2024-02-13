@@ -13,7 +13,7 @@ def handler(data):
     print("DATA", data)
 
     try:
-        es = Elasticsearch(hosts=elastic_url)
+        es = Elasticsearch(hosts='http://10.1.111.13:9201')
         es.index(index=index_name, document=data, id=document_id)
         print("Success insert data to elastic")
     except Exception as e:

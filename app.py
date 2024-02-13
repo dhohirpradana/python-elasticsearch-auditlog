@@ -72,14 +72,16 @@ def log_request(path):
         print("LOG DATA", log_data_f)
         es_handler(log_data_f)
 
-    def cut_data_char(log_data):
-        for key in log_data['data'].keys():
-            if len(log_data['data'][key]) > max_length:
-                log_data['data'][key] = log_data['data'][key][:max_length] + \
+    def cut_data_char(log):
+        print(log)
+        if 'content' in log['data']:
+            if len(log['data']['content']) > max_length:
+                log['data']['content'] = log['data']['content'][:max_length] + \
                     '...and ' + \
-                    str(len(log_data['data'][key]) - max_length) + ' char'
+                    str(len(log['data']['content']) -
+                        max_length) + ' char'
 
-        return log_data
+        return log
 
     headers = dict(request.headers)
     keys_to_remove = ['Content-Type', 'User-Agent', 'Accept', 'Postman-Token',
