@@ -25,8 +25,10 @@ def validate_envs():
 def log_request(path):
     print("path", path)
     log_data_f = {}
+    now = datetime.datetime.now()
+    now = now.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
     log_data = {
-        'timestamp': datetime.datetime.now().isoformat(),
+        'timestamp': now,
         'method': request.method,
         'url': request.url.replace(my_url, ''),
         'headers': dict(request.headers),
