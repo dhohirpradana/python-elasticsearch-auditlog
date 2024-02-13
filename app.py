@@ -66,7 +66,6 @@ def log_request(path):
             'status_code': status_code
         }
         log_data_f['res'] = res
-        print("LOG DATA", log_data_f)
         es_handler(log_data_f)
 
     def cut_data_char(log):
