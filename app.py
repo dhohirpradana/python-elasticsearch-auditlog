@@ -51,6 +51,21 @@ def log_request(path):
             return dict(request.form)
         return json.loads(request.get_data().decode('utf-8'))
 
+    def save_log(r):
+        status_code = r.status_code
+        log_data_f['req'] = log_data
+        try:
+            data = r.json()
+        except:
+            data = ''
+        res = {
+            'message': "Success",
+            'data': data,
+            'status_code': status_code
+        }
+        log_data_f['res'] = res
+        es_handler(log_data_f)
+
     headers = dict(request.headers)
     keys_to_remove = ['Content-Type', 'User-Agent', 'Accept', 'Postman-Token',
                       'Host', 'Accept-Encoding', 'Connection', 'Content-Length']
@@ -78,6 +93,8 @@ def log_request(path):
                 print(
                     f"Request failed with status code {response.status_code}: {response.json()}")
 
+            save_log(response)
+
             return jsonify(response.json()), response.status_code
 
         if request.method.lower() == 'get':
@@ -90,6 +107,8 @@ def log_request(path):
                 print(
                     f"Request failed with status code {response.status_code}: {response.json()}")
 
+            save_log(response)
+
             return jsonify(response.json()), response.status_code
 
         if request.method.lower() == 'put':
@@ -100,6 +119,9 @@ def log_request(path):
             else:
                 print(
                     f"Request failed with status code {response.status_code}: {response.json()}")
+
+            save_log(response)
+
             return jsonify(response.json()), response.status_code
 
         if request.method.lower() == 'patch':
@@ -110,6 +132,9 @@ def log_request(path):
             else:
                 print(
                     f"Request failed with status code {response.status_code}: {response.json()}")
+
+            save_log(response)
+
             return jsonify(response.json()), response.status_code
 
         if request.method.lower() == 'delete':
@@ -120,6 +145,9 @@ def log_request(path):
             else:
                 print(
                     f"Request failed with status code {response.status_code}: {response.json()}")
+
+            save_log(response)
+
             return jsonify(response.json()), response.status_code
 
     except requests.HTTPError as e:

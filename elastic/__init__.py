@@ -1,10 +1,9 @@
-from elasticsearch import Elasticsearch
-from elasticsearch.helpers import bulk
-from elasticsearch.client import XPackClient
 import os
 import uuid
+from elasticsearch import Elasticsearch
 
 elastic_url = os.environ.get('ELASTIC_URL')
+
 
 def handler(data):
     index_name = "sapujagadv2_auditlog"
