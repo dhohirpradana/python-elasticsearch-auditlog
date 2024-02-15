@@ -144,14 +144,17 @@ def log_request(path):
         if request.method.lower() == 'delete':
             response = requests.delete(url, headers=headers)
             if response.status_code == 200:
-                data = response.json()
+                try:
+                    data = response.json()
+                except:
+                    data = {}
             else:
                 print(
                     f"Request failed with status code {response.status_code}: {response.json()}")
 
             save_log(response)
 
-            return jsonify(response.json()), response.status_code
+            return jsonify(data), response.status_code
 
     except requests.HTTPError as e:
         print(e)
