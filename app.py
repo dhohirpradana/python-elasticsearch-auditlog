@@ -66,7 +66,7 @@ def log_request(path):
         try:
             data = r.json()
         except:
-            data = ''
+            data = None
         res = {
             'message': "Success",
             'data': data,
@@ -146,15 +146,18 @@ def log_request(path):
             if response.status_code == 200:
                 try:
                     data = response.json()
+                    save_log(response)
+                    return jsonify(data), response.status_code
                 except:
-                    data = {}
+                    data = None
+                    save_log(response)
+                    return jsonify(data), response.status_code
             else:
                 print(
-                    f"Request failed with status code {response.status_code}: {response.json()}")
+                    f"Request failed with status code {response.status_code}: {response}")
 
             save_log(response)
-
-            return jsonify(data), response.status_code
+            return jsonify(None), response.status_code
 
     except requests.HTTPError as e:
         print(e)
