@@ -75,6 +75,14 @@ def log_request(path):
         log_data_f['res'] = res
         es_handler(log_data_f)
 
+    def check_res_json(rj):
+        try:
+            data = rj.json()
+        except:
+            data = None
+
+        return data
+
     headers = dict(request.headers)
     keys_to_remove = ['Content-Type', 'User-Agent', 'Accept', 'Postman-Token',
                       'Host', 'Accept-Encoding', 'Connection', 'Content-Length']
@@ -89,75 +97,50 @@ def log_request(path):
             response = requests.post(url, headers=headers,
                                      json=to_json(), verify=False, timeout=60)
 
-            if response.status_code == 200:
-                data = response.json()
-            else:
-                print(
-                    f"Request failed with status code {response.status_code}: {response.json()}")
+            data = check_res_json(response)
 
             save_log(response)
 
-            return jsonify(response.json()), response.status_code
+            return jsonify(data), response.status_code
 
         if request.method.lower() == 'get':
             response = requests.get(url, headers=headers)
 
-            if response.status_code == 200:
-                data = response.json()
-            else:
-                print(
-                    f"Request failed with status code {response.status_code}: {response.json()}")
+            data = check_res_json(response)
 
             save_log(response)
 
-            return jsonify(response.json()), response.status_code
+            return jsonify(data), response.status_code
 
         if request.method.lower() == 'put':
             log_data['data'] = to_json()
 
             response = requests.put(url, headers=headers, json=to_json())
 
-            if response.status_code == 200:
-                data = response.json()
-            else:
-                print(
-                    f"Request failed with status code {response.status_code}: {response.json()}")
+            data = check_res_json(response)
 
             save_log(response)
 
-            return jsonify(response.json()), response.status_code
+            return jsonify(data), response.status_code
 
         if request.method.lower() == 'patch':
             log_data['data'] = to_json()
 
             response = requests.patch(url, headers=headers, json=to_json())
-            if response.status_code == 200:
-                data = response.json()
-            else:
-                print(
-                    f"Request failed with status code {response.status_code}: {response.json()}")
+
+            data = check_res_json(response)
 
             save_log(response)
 
-            return jsonify(response.json()), response.status_code
+            return jsonify(data), response.status_code
 
         if request.method.lower() == 'delete':
             response = requests.delete(url, headers=headers)
-            if response.status_code == 200:
-                try:
-                    data = response.json()
-                    save_log(response)
-                    return jsonify(data), response.status_code
-                except:
-                    data = None
-                    save_log(response)
-                    return jsonify(data), response.status_code
-            else:
-                print(
-                    f"Request failed with status code {response.status_code}: {response}")
+
+            data = check_res_json(response)
 
             save_log(response)
-            return jsonify(None), response.status_code
+            return jsonify(data), response.status_code
 
     except requests.HTTPError as e:
         print(e)
