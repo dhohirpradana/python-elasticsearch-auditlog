@@ -1,7 +1,7 @@
 import datetime
+import os
 from flask import Flask, request, jsonify
 import requests
-import os
 
 from flask_cors import CORS
 from elastic import handler as es_handler
