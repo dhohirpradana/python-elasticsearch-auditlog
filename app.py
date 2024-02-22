@@ -39,7 +39,7 @@ def log_request(path):
     if request.query_string:
         url = url + '?' + request.query_string.decode('utf-8')
 
-    if "jupyter3" in url:
+    if "bodha.co.id" in url:
         url = url.replace("https://", "http://")
 
     print("url", url)
