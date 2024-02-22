@@ -20,9 +20,54 @@ def validate_envs():
                 f"Required environment variable {env_var} is not set.")
 
 
+def check_res_json(rj):
+    try:
+        data = rj.json()
+    except:
+        data = None
+
+    return data
+
+# check if data is form data or json
+
+
+def to_json():
+    # print(request.form)
+    # if request.headers['Content-Type'] contains 'application/x-www-form-urlencoded' or 'multipart/form-data'
+    if request.form:
+        # Filter values exceeding 100 characters
+        filtered_form_data = {key: value[:100]
+                              for key, value in request.form.items()}
+
+        print("FILTERED", dict(filtered_form_data))
+
+        # Convert to JSON format
+        return dict(filtered_form_data)
+
+    else:
+        print("JSON DATA")
+        return request.get_json()
+
+
+def save_log(r, log_data):
+    status_code = r.status_code
+    log_data_f = {}
+    log_data_f['req'] = log_data
+    try:
+        data = r.json()
+    except:
+        data = None
+    res = {
+        'message': "Success",
+        'data': data,
+        'status_code': status_code
+    }
+    log_data_f['res'] = res
+    es_handler(log_data_f)
+
+
 def log_request(path):
     print("path", path)
-    log_data_f = {}
     now = datetime.datetime.now()
     now = now.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
     log_data = {
@@ -33,7 +78,6 @@ def log_request(path):
     }
 
     url = path
-    max_length = 20
 
     # join url and query string
     if request.query_string:
@@ -44,47 +88,6 @@ def log_request(path):
 
     print("url", url)
     print("REQUEST", request.data)
-
-    # check if data is form data or json
-    def to_json():
-        # print(request.form)
-        # if request.headers['Content-Type'] contains 'application/x-www-form-urlencoded' or 'multipart/form-data'
-        if request.form:
-            # Filter values exceeding 100 characters
-            filtered_form_data = {key: value[:100]
-                                  for key, value in request.form.items()}
-
-            print("FILTERED", dict(filtered_form_data))
-
-            # Convert to JSON format
-            return dict(filtered_form_data)
-
-        else:
-            print("JSON DATA")
-            return request.get_json()
-
-    def save_log(r):
-        status_code = r.status_code
-        log_data_f['req'] = log_data
-        try:
-            data = r.json()
-        except:
-            data = None
-        res = {
-            'message': "Success",
-            'data': data,
-            'status_code': status_code
-        }
-        log_data_f['res'] = res
-        es_handler(log_data_f)
-
-    def check_res_json(rj):
-        try:
-            data = rj.json()
-        except:
-            data = None
-
-        return data
 
     headers = dict(request.headers)
     keys_to_remove = ['Content-Type', 'User-Agent', 'Accept', 'Postman-Token',
@@ -102,7 +105,7 @@ def log_request(path):
 
             data = check_res_json(response)
 
-            save_log(response)
+            save_log(response, log_data)
 
             return jsonify(data), response.status_code
 
@@ -112,9 +115,11 @@ def log_request(path):
 
             data = check_res_json(response)
 
-            save_log(response)
+            print("DATA:", data)
 
-            return jsonify(data), response.status_code
+            save_log(response, log_data)
+
+            return data, response.status_code
 
         if request.method.lower() == 'put':
             log_data['data'] = to_json()
@@ -124,7 +129,7 @@ def log_request(path):
 
             data = check_res_json(response)
 
-            save_log(response)
+            save_log(response, log_data)
 
             return jsonify(data), response.status_code
 
@@ -136,7 +141,7 @@ def log_request(path):
 
             data = check_res_json(response)
 
-            save_log(response)
+            save_log(response, log_data)
 
             return jsonify(data), response.status_code
 
@@ -146,90 +151,23 @@ def log_request(path):
 
             data = check_res_json(response)
 
-            save_log(response)
+            save_log(response, log_data)
             return jsonify(data), response.status_code
 
     except requests.HTTPError as e:
         print(e)
         return jsonify({"message": str(e)}), 500
 
-    # try:
-    #     if request.method.lower() == 'get':
-    #         r = requests.get(url, headers=headers)
-    #     elif request.method.lower() == 'post':
-    #         log_data['data'] = to_json()
-    #         if 'content' in log_data['data']:
-    #             if len(log_data['data']['content']) > max_length:
-    #                 log_data['data']['content'] = log_data['data']['content'][:max_length] + \
-    #                     '...and ' + \
-    #                     str(len(log_data['data']['content']) -
-    #                         max_length) + ' char'
-    #         r = requests.post(url, headers=headers, json=to_json())
-    #     elif request.method.lower() == 'put':
-    #         log_data['data'] = to_json()
-    #         if 'content' in log_data['data']:
-    #             if len(log_data['data']['content']) > max_length:
-    #                 log_data['data']['content'] = log_data['data']['content'][:max_length] + \
-    #                     '...and ' + \
-    #                     str(len(log_data['data']['content']) -
-    #                         max_length) + ' char'
-    #         r = requests.put(url, headers=headers, json=to_json())
-    #     elif request.method.lower() == 'patch':
-    #         log_data['data'] = to_json()
-    #         if 'content' in log_data['data']:
-    #             if len(log_data['data']['content']) > max_length:
-    #                 log_data['data']['content'] = log_data['data']['content'][:max_length] + \
-    #                     '...and ' + \
-    #                     str(len(log_data['data']['content']) -
-    #                         max_length) + ' char'
-    #         r = requests.patch(url, headers=headers, json=to_json())
-    #     elif request.method.lower() == 'delete':
-    #         r = requests.delete(url, headers=headers)
-    #     else:
-    #         print("Invalid method specified")
-    #         return jsonify({"message": "Invalid method specified"}), 400
-
-    #     r.raise_for_status()
-    #     status_code = r.status_code
-    #     log_data_f['req'] = log_data
-    #     try:
-    #         data = r.json()
-    #     except:
-    #         data = ''
-    #     res = {
-    #         'message': "Success",
-    #         'status_code': status_code
-    #     }
-    #     log_data_f['res'] = res
-    #     es_handler(log_data_f)
-    #     return jsonify(data), status_code
-
-    # except requests.HTTPError as e:
-    #     status_code = e.response.status_code
-    #     log_data_f['req'] = log_data
-    #     res = {
-    #         'message': str(e),
-    #         'status_code': status_code
-    #     }
-    #     log_data_f['res'] = res
-    #     print("Error message:", e)
-    #     print("log_data_f", log_data_f)
-    #     es_handler(log_data_f)
-    #     return jsonify({"message": str(e)}), status_code
-
-    # except Exception as e:
-    #     print("Error:", e)
-    #     traceback_info = traceback.format_exc()
-
-    #     print(traceback_info)
-    #     return jsonify({"message": str(e)}), 500
-
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>', methods=['POST', 'GET', 'PATCH', 'PUT', 'DELETE'])
 def catch_all(path):
+    if not path.startswith(('http://', 'https://')):
+        return jsonify(None), 200
+
     validate_envs()
-    return log_request(path)
+    data, code = log_request(path)
+    return jsonify(data), code
 
 # test
 
