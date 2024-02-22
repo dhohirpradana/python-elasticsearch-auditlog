@@ -104,7 +104,8 @@ def log_request(path):
             return jsonify(data), response.status_code
 
         if request.method.lower() == 'get':
-            response = requests.get(url, headers=headers)
+            response = requests.get(
+                url, headers=headers, verify=False, timeout=60)
 
             data = check_res_json(response)
 
@@ -115,7 +116,8 @@ def log_request(path):
         if request.method.lower() == 'put':
             log_data['data'] = to_json()
 
-            response = requests.put(url, headers=headers, json=to_json())
+            response = requests.put(
+                url, headers=headers, json=to_json(), verify=False, timeout=60)
 
             data = check_res_json(response)
 
@@ -126,7 +128,8 @@ def log_request(path):
         if request.method.lower() == 'patch':
             log_data['data'] = to_json()
 
-            response = requests.patch(url, headers=headers, json=to_json())
+            response = requests.patch(
+                url, headers=headers, json=to_json(), verify=False, timeout=60)
 
             data = check_res_json(response)
 
@@ -135,7 +138,8 @@ def log_request(path):
             return jsonify(data), response.status_code
 
         if request.method.lower() == 'delete':
-            response = requests.delete(url, headers=headers)
+            response = requests.delete(
+                url, headers=headers, verify=False, timeout=60)
 
             data = check_res_json(response)
 
