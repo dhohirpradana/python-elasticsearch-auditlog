@@ -1,9 +1,11 @@
 import datetime
 from flask import Flask, request, jsonify
 import requests
+from flask_cors import CORS
 from elastic import handler as elastic_handler
 
 app = Flask(__name__)
+CORS(app, origins="*")
 
 
 def to_json():
@@ -17,15 +19,24 @@ def to_json():
 
     else:
         print("JSON DATA")
+        print(request.get_json())
         return request.get_json()
 
 
 @app.route('/<path:url>', methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH'])
 def proxy_request(url):
+    s = requests.Session()
+
+    header = {
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.'}
+    s.headers.update(header)
+
     full_url = f'{url}'
 
     if request.query_string:
-        full_url += f'?{request.query_string.decode("utf-8")}'
+        full_url += f'?{request.query_string.decode("utf-8")}&antibot=true&premium_proxy=true&proxy_country=us'
+
+    print("FULL URL", full_url)
 
     now = datetime.datetime.now()
     now = now.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
@@ -54,23 +65,26 @@ def proxy_request(url):
             })
 
     # Make the request
-    response = requests.request(
+    response = s.request(
         method=request.method,
         url=full_url,
         headers=headers,
-        data=data,
+        # data=data,
+        json=data,
         cookies=request.cookies,
-        files=request.files,
-        allow_redirects=False,
-        verify=False,
-        timeout=60
+        files=files
     )
 
-    # Check if the response is JSON
     try:
         response_data = response.json()
+        de = response_data
     except ValueError:
         response_data = response.text
+        de = {
+            'text': response_data
+        }
+
+    print("RESPONSE", response_data)
 
     log_data['req'] = {
         'headers': dict(request.headers),
@@ -82,7 +96,7 @@ def proxy_request(url):
     log_data['res'] = {
         'status_code': response.status_code,
         'headers': dict(response.headers),
-        'data': response_data
+        'data': de
     }
 
     elastic_handler(log_data)
