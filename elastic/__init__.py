@@ -10,6 +10,8 @@ def handler(data):
     uuid4 = uuid.uuid4()
     document_id = uuid4
 
+    print("DATA", data)
+
     try:
         es = Elasticsearch(hosts=elastic_url)
         es.index(index=index_name, document=data, id=document_id)

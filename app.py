@@ -18,8 +18,8 @@ def to_json():
         return dict(filtered_form_data)
 
     else:
-        print("JSON DATA")
-        print(request.get_json())
+        # print("JSON DATA")
+        # print(request.get_json())
         return request.get_json()
 
 
@@ -34,9 +34,9 @@ def proxy_request(url):
     full_url = f'{url}'
 
     if request.query_string:
-        full_url += f'?{request.query_string.decode("utf-8")}&antibot=true&premium_proxy=true&proxy_country=us'
+        full_url += f'?{request.query_string.decode("utf-8")}'
 
-    print("FULL URL", full_url)
+    # print("FULL URL", full_url)
 
     now = datetime.datetime.now()
     now = now.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
@@ -84,7 +84,7 @@ def proxy_request(url):
             'text': response_data
         }
 
-    print("RESPONSE", response_data)
+    # print("RESPONSE", response_data)
 
     log_data['req'] = {
         'headers': dict(request.headers),
